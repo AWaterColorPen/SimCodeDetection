@@ -1,0 +1,177 @@
+﻿@model SimCodeDetectionWeb.Models.Problem
+@using SimCodeDetectionWeb.Models;
+
+@{
+    ViewBag.Title = Model.title;
+}
+
+<style type="text/CSS">
+    dd {
+        font-family:'Times New Roman';
+        font-size:21px;
+        margin:30px;
+    }
+</style>
+<script type="text/javascript">
+    $(function () {
+        $("#summary").click(
+            function () {
+                $("#summaryhtml").attr("src", "/Problem/Summary/" + @Model.Id);
+                $("#summaryhtml").load(function(){
+                    var mainheight = $(this).contents().find("body").height()+30;
+                    $(this).height(mainheight);
+                }); 
+            }
+        );
+        $("#rejudge").click(
+            function () {
+                $.post("/Problem/ReJudgeProblem/" + @Model.Id,
+                    function(data) {
+                        alert(data);
+                    }
+                );
+            }
+        );
+        $("#judgetype").click(
+            function () {
+                var tp = parseInt($("input[name='options1']:checked").val()) + parseInt($("input[name='options2']:checked").val());
+                $.post("/Problem/JudgeTypeChange?id=" + @Model.Id + "&" + "tp=" + tp,
+                    function(data) {
+                        alert(data);
+                    }
+                );
+            }
+        );
+        $("#modalbutton").click(
+            function () {
+                if (@Model.judgeType == 0) {
+                    $("#radio1").attr("checked", "checked");
+                    $("#radio3").attr("checked", "checked");
+                }
+                if (@Model.judgeType == 1) {
+                    $("#radio2").attr("checked", "checked");
+                    $("#radio3").attr("checked", "checked");
+                }
+                if (@Model.judgeType == 2) {
+                    $("#radio1").attr("checked", "checked");
+                    $("#radio4").attr("checked", "checked");
+                }
+                if (@Model.judgeType == 3) {
+                    $("#radio2").attr("checked", "checked");
+                    $("#radio4").attr("checked", "checked");
+                }
+            }
+        );
+    });
+</script>
+
+<body>
+    <div class="modal fade" id="modal" tabindex="1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Judge Type Modal</h4>
+                </div>
+                <div class="modal-body container">
+                    <div class="form-group container well">
+                        <label class="radio-inline col-md-5">
+                            <input type="radio" name="options1" id="radio1" value="0"> Only Judging With Early Submissions
+                        </label>
+                        <label class="radio-inline col-md-5">
+                            <input type="radio" name="options1" id="radio2" value="1"> Judging With All Submissions
+                        </label>
+                    </div>
+                    <br />
+                    <div class="form-group container well">
+                        <label class="radio-inline col-md-5">
+                            <input type="radio" name="options2" id="radio3" value="0"> Judging Without Submissions From Same Users
+                        </label>
+                        <label class="radio-inline col-md-5">
+                            <input type="radio" name="options2" id="radio4" value="2"> Judging Include Submissions From Same Users
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    @if (User.Identity.IsAuthenticated && (ViewBag.User.userName == Model.OUser.userName || ViewBag.User.userLevel == "Admin"))
+                    {
+                        <button type="button" class="btn btn-primary" id="judgetype">Save changes</button>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <h1 class="h1 text-center">@Model.Id - @Model.title</h1>
+    <div class="row">
+        <br />
+        @if (User.Identity.IsAuthenticated && (ViewBag.User.userName == Model.OUser.userName || ViewBag.User.userLevel == "Admin"))
+        {
+            <div class="col-md-6 col-md-offset-3 container well">
+                <div class="col-md-4">
+                    <button class="glyphicon glyphicon-user btn btn-default btn-block">@Model.OUser.userName</button>
+                </div>
+                <div class="col-md-4">
+                    <button class="glyphicon glyphicon-repeat btn btn-default btn-block" id="rejudge">ReJudge</button>
+                </div>
+                <div class="col-md-4">
+                    @Html.ActionLink("Edit", "Edit", new { id = Model.Id }, new { @class = "glyphicon glyphicon-pencil btn btn-default btn-block" })
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="col-md-2 col-md-offset-5">
+                <button class="glyphicon glyphicon-user btn btn-primary btn-block"> @Model.OUser.userName</button>
+            </div>
+        }
+        <br />
+        <br />
+    </div>
+    
+    <ul class="nav nav-tabs nav-justified text-center">
+        <li><h4><span class="glyphicon glyphicon-cog label label-danger" data-toggle="modal" data-target="#modal" id="modalbutton"> Judge Type Setting</span></h4></li>
+        <li><h4><span class="label label-warning glyphicon glyphicon-time"> @Model.endTime</span></h4></li>
+        <li>User <span class="badge">@Model.users</span></li>
+        <li>Submissions <span class="badge">@Model.submissions.Count</span></li>
+        <li class="active"><a href="#tab1" data-toggle="tab">Problem Detail</a></li>
+        <li><a href="#tab2" data-toggle="tab">Submit</a></li>
+        <li><a href="#tab3" data-toggle="tab" id="summary">Summary</a></li>
+    </ul>
+    <hr />
+    <div class="tab-content">
+        <div class="tab-pane fade in active" id="tab1">
+            <dl>
+                <dt>DESCRIPTION</dt>
+                <dd>@Html.DisplayFor(model => model.description)</dd>
+                <dt>INPUT</dt>
+                <dd>@Html.DisplayFor(model => model.input)</dd>
+                <dt>OUTPUT</dt>
+                <dd>@Html.DisplayFor(model => model.output)</dd>
+                <dt>SAMPLE INPUT</dt>
+                <dd><pre>@Html.DisplayFor(model => model.simpleInput)</pre></dd>
+                <dt>SAMPLE OUTPUT</dt>
+                <dd><pre>@Html.DisplayFor(model => model.simpleOutput)</pre></dd>
+            </dl>
+        </div>
+        <div class="tab-pane fade" id="tab2">
+            @using (Html.BeginForm("Submit", "Problem", FormMethod.Post))
+            {
+                <textarea name="_source" class="form-control" rows="25" cols="55" style="font-size:12px; font-family: Courier New; resize: none;"></textarea>
+                <hr />
+                <input name="pid" hidden="hidden" value=@Model.Id />
+                @Html.AntiForgeryToken()
+                <div class="form-group">
+                    <input type="submit" value="Submit" class="btn btn-block btn-default" />
+                </div>
+            }
+        </div>
+        <div class="tab-pane fade" id="tab3">
+            <div class="container">
+                <iframe id="summaryhtml" class="btn-block" frameborder="0" scrolling="no"></iframe>
+            </div>
+        </div>
+    </div>
+</body>
+

@@ -1,0 +1,82 @@
+﻿@using SimCodeDetectionWeb.CodeParse;
+
+@{
+    
+    ViewBag.Title = "Syntax Analysis And Slicing";
+}
+
+<style type="text/CSS">
+    pre {
+        border-width: 0px;
+        background-color: white;
+    }
+</style>
+
+<h2>Syntax Analysis And Slicing</h2>
+
+<body>
+    <form action="/Home/Syntax" method="POST">
+        @Html.AntiForgeryToken()
+        <div class="panel-group">
+            <div class="panel panel-success">
+                <div class="panel-heading">
+                    <p class="text-center"><strong>Source Code For Syntax Analysis And Slicing</strong></p>
+                </div>
+                <div class="panel-body">
+                    @if (IsPost == false)
+                    {
+                        <textarea name="source" class="form-control" rows="30" cols="55" style="font-size:12px; font-family: Courier New; resize: none;" required="required"></textarea>
+                    }
+                    else
+                    {
+                        foreach (var snippet in ViewBag.snippets)
+                        {
+                            if (snippet.status == SnippetStatus.METHOD || snippet.status == SnippetStatus.STRUCT || snippet.status == SnippetStatus.CLASS)
+                            {
+                                <div class="panel panel-success">
+                                    <div class="panel-heading">
+                                        <strong>@snippet.status</strong>
+                                    </div>
+                                    <pre>@snippet.text</pre>
+                                    <div class="panel-footer">
+                                        <p>line: @snippet.lines</p>
+                                    </div>
+                                </div>
+                            }
+                            if (snippet.status == SnippetStatus.SHORT)
+                            {
+                                <div class="panel panel-info">
+                                    <div class="panel-heading">
+                                        <strong>@snippet.status</strong>
+                                    </div>
+                                    <pre>@snippet.text</pre>
+                                    <div class="panel-footer">
+                                        <p>line: @snippet.lines</p>
+                                    </div>
+                                </div>
+                            }
+                            if (snippet.status == SnippetStatus.OTHER)
+                            {
+                                <div class="panel panel-warning">
+                                    <div class="panel-heading">
+                                        <strong>@snippet.status</strong>
+                                    </div>
+                                    <pre>@snippet.text</pre>
+                                    <div class="panel-footer">
+                                        <p>line: @snippet.lines</p>
+                                    </div>
+                                </div>
+                            }
+                            <hr />
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+        @if (IsPost == false)
+        {
+            <br />
+            <button class="btn btn-block btn-success" type="submit">Syntax Analysis Start</button>
+        }
+    </form>
+</body>

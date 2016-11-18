@@ -1,0 +1,40 @@
+﻿@model IEnumerable<SimCodeDetectionWeb.Models.Submission>
+
+@{
+    ViewBag.Title = "Status";
+}
+
+<div class="container">
+    <br />
+    <div class="row">
+    </div>
+    <div class="form-inline well">
+    </div>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Run ID</th>
+                <th>Problem</th>
+                <th>User</th>
+                <th>Result</th>
+                <th>Language</th>
+                <th>Submit Time</th>
+            </tr>
+        </thead>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td>@Html.ActionLink(item.problem.title, "Show", "Problem", new { id = item.problem.Id }, new { } )</td>
+                <td>@Html.ActionLink(item.OUser.userName, "U", "Status", new { id = item.OUser.Id }, new { })</td>
+                @{
+                    var count = SimCodeDetectionWeb.Tools.JsonTool.Json2ListSimResult(item.results);
+                    <td>@Html.ActionLink(item.status + " (" + count.Count + ")", "Solution", "Status", new { id = item.Id }, new { })</td>
+                }
+                <td>@item.language</td>
+                <td>@item.subTime</td>
+            </tr>
+        }
+    </table>
+</div>
+    

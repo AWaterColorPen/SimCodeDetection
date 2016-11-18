@@ -1,0 +1,59 @@
+﻿@model IEnumerable<SimCodeDetectionWeb.Models.Problem>
+@using SimCodeDetectionWeb.Models;
+
+@{
+    ViewBag.Title = "Problem List";
+}
+
+<div>
+    <br />
+    <div class="row">
+
+    </div>
+    <nav class="col-md-5">
+        <ul class="pagination">
+            @for (int i = 1; i <= ViewBag.Pages; i++)
+            {
+                <li><a href=@("/Problem/List/" + i)>@i</a></li>
+            }
+        </ul>
+    </nav>
+    @if (User.Identity.IsAuthenticated)
+    {
+        if (ViewBag.User.userLevel != "Student")
+        {
+            <form class="form-inline well col-md-7" action="/Problem/Crawl">
+                <div class="col-md-9 input-group">
+                    <input name="url" type="text" class="form-control" value="http://acm.hust.edu.cn/problem/show/1001">
+                    <span class="input-group-btn">
+                        <button type="submit" class="btn btn-default">Crawl Problem</button>
+                    </span>
+                </div>
+                <div class="col-md-3">
+                    <a class="btn btn-default btn-block" href="/problem/create" role="button">Add New Problem</a>
+                </div>
+            </form>
+        }
+    }
+</div>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th class="col-md-2">ID</th>
+            <th class="col-md-4">Title</th>
+            <th class="col-md-2">Jugde Type</th>
+            <th class="col-md-2">User / Submissions</th>
+            <th class="col-md-2">Setter</th>
+        </tr>
+    </thead>
+@foreach (var item in Model) {
+    <tr>
+        <td>@Html.DisplayFor(modelItem => item.Id)</td>
+        <td>@Html.ActionLink(item.title, "Show", new { id = item.Id })</td>
+        <td>@Html.DisplayFor(modelItem => item.judgeType)</td>
+        <td>@item.users / @item.submissions.Count</td>
+        <td>@Html.DisplayFor(modelItem => item.OUser.userName)</td>
+    </tr>
+}
+</table>

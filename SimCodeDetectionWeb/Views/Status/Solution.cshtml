@@ -1,0 +1,100 @@
+﻿@model SimCodeDetectionWeb.Models.Submission
+@{
+    ViewBag.Title = "Solution";
+}
+
+<script>
+    hljs.initHighlightingOnLoad();
+</script>
+
+<style type="text/CSS">
+    div.form-group {
+        border-style: none dashed dashed dashed;
+        border-width: thin;
+        border-color: whitesmoke;
+        padding: 10px;
+    }
+    pre {
+        border-width: 0px;
+        background-color: white;
+    }
+</style>
+<div class="container">
+    <div class="col-md-10">
+        <div class="form-group">
+            <button class="btn btn-default btn-block" data-toggle="collapse" data-target="#source">@Model.OUser.userName - @Model.subTime</button>
+            <div id="source" class="collapse in">
+                <pre><code>@Model.source</code></pre>
+            </div>
+        </div>
+        <hr />
+        @for (var i = 0; i < ViewBag.Results.Count; i++)
+        {
+            var result = ViewBag.Results[i];
+            <div class="form-group container">
+                @*
+                        <div class="input-group col-md-12">
+                        <span class="input-group-btn">
+                            <button class="btn btn-default" data-toggle="collapse" data-target=@("#result" + i)>(@result.simvalue.ToString("P"))</button>
+                        </span>
+                        <span class="input-group-addon">
+                            <span class="pull-left">
+                                Compare With <a href=@("/Status/U/" + ViewBag.OtherUser[i])>@ViewBag.MPW[i].Key</a> 's Source
+                            </span>
+                            <span class="pull-right">
+                                @ViewBag.MPW[i].Value
+                            </span>
+                        </span>
+                    </div>
+                *@
+                <div class="form-group container well col-md-12">
+                    <button class="btn btn-default col-md-2" data-toggle="collapse" data-target=@("#result" + i)>(@result.simvalue.ToString("P"))</button>
+                    <div class="col-md-10">
+                        <span class="pull-left">
+                            Compare With <a href=@("/Status/U/" + ViewBag.OtherUser[i])>@ViewBag.MPW[i].Key</a> 's Source
+                        </span>
+                        <span class="pull-right">
+                            @ViewBag.MPW[i].Value
+                        </span>
+                    </div>
+                </div>
+                <br />
+                <div id=@("result" + i) class="collapse">
+                    <div>
+                        <ul class="nav nav-pills nav-stacked col-md-2">
+                            @for (var j = 0; j < ViewBag.data[i].Count; j++)
+                            {
+                                <li><a href=@("#tab" + i + "-" + j) data-toggle="tab">Codes @result.sim[j].ToString("P")</a></li>
+                            }
+                        </ul>
+                        <div class="tab-content col-md-10">
+                            @for (var j = 0; j < ViewBag.data[i].Count; j++)
+                            {
+                                <div class="tab-pane fade" id=@("tab" + i + "-" + j)>
+                                    <ul class="nav nav-tabs nav-justified">
+                                        <li class="active"><a href=@("#tab" + i + "-" + j + "-1") data-toggle="tab">Code Snippet In @Model.OUser.userName</a></li>
+                                        <li><a href=@("#tab" + i + "-" + j + "-2") data-toggle="tab">Code Snippet In @ViewBag.MPW[i].Key </a></li>
+                                    </ul>
+                                    <div class="tab-content">
+                                        <div class="tab-pane fade in active" id=@("tab" + i + "-" + j + "-1")>
+                                            <p></p>
+                                            <pre><code>@ViewBag.data[i][j].Key</code></pre>
+                                        </div>
+                                        <div class="tab-pane fade" id=@("tab" + i + "-" + j + "-2")>
+                                            <p></p>
+                                            <pre><code>@ViewBag.data[i][j].Value</code></pre>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        }
+    </div>
+    <div class="col-md-2">
+    </div>
+</div>
